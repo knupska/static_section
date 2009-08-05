@@ -9,7 +9,8 @@ Requirements: Symphony 2.0.6
 
 [INSTALLATION]
 
-1. Upload the 'static_section' folder in this archive to your Symphony 'extensions' folder.
+1. Upload the root folder found in this archive to your Symphony 'extensions' folder and rename it as 'static_section'.
+   (The folder will initially be called 'knupska-static-section-field-...')
 
 2. Enable it by selecting the "Static Section" extension, choose Enable from the 'With Selected' dropdown menu, then click Apply.
 
