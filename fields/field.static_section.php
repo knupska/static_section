@@ -37,7 +37,7 @@
 			$fields = array();
 			$fields['field_id'] = $id;
 			$fields['section_id'] = $parent_id;
-			$this->_engine-> Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
+			$this->_engine->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
 			return $this->_engine->Database->insert($fields, 'tbl_fields_' . $this->handle());					
 		}
 		

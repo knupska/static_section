@@ -1,16 +1,16 @@
 Static Section Field
 ------------------------------------
 
-Version: 1.0
+Version: 1.1
 Author: Nathan Martin (nathan@knupska.com)
 Build Date: 2009-08-06
 Requirements: Symphony 2.0.6
 			  (Very likely compatible with earlier versions, only tested in 2.0.6)
 
 [INSTALLATION]
-
-1. Upload the root folder found in this archive to your Symphony 'extensions' folder and rename it as 'static_section'.
-   (The folder will initially be called 'knupska-static-section-field-...')
+1. Upload the 'static_section' folder found in this archive to your Symphony 'extensions' folder.
+   (If you have retrieved the extension via the download button in github you will have to
+   rename the folder to 'static_section' as it will be called 'knupska-static_section-...')
 
 2. Enable it by selecting the "Static Section" extension, choose Enable from the 'With Selected' dropdown menu, then click Apply.
 

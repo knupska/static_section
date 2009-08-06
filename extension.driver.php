@@ -7,10 +7,11 @@
 	
 		protected $section_data;
 		protected $_page;
+		protected $hide_delete;
 		
 		public function about(){
 			return array('name' => 'Static Section',
-						 'version' => '1.0',
+						 'version' => '1.1',
 						 'release-date' => '2009-08-06',
 						 'author' => array('name' => 'Nathan Martin',
 										   'website' => 'http://knupska.com',
@@ -29,13 +30,19 @@
 							'page' => '/administration/',
 							'delegate' => 'NavigationPreRender',
 							'callback' => 'applyStaticSections'
+						),
+						array(
+							'page' => '/administration/',
+							'delegate' => 'AdminPagePostGenerate',
+							'callback' => 'removeDeleteButton'
 						)
 			);
 		}
 		
-		public function appendScriptToHead($context) { 
+		public function appendScriptToHead($context) {
+			$this->hide_delete = false;
 			$entryManager = new EntryManager($this->_Parent);
-			$sections = $this->_Parent->Database-> fetch("SELECT section_id AS id, handle FROM tbl_fields_static_section LEFT JOIN tbl_sections ON tbl_fields_static_section.section_id = tbl_sections.id");
+			$sections = $this->_Parent->Database->fetch("SELECT section_id AS id, handle FROM tbl_fields_static_section LEFT JOIN tbl_sections ON tbl_fields_static_section.section_id = tbl_sections.id");
 			$this->section_data = array(
 								'handles' => array(),
 								'entries' => array()
@@ -85,7 +92,7 @@
 							Alert::SUCCESS);
 					}
 					
-					Administration::instance()->Page->addScriptToHead(URL . '/extensions/static_section/assets/static_section.js', 90);
+					$this->hide_delete = true;
 				}
 			}
 		}
@@ -113,6 +120,16 @@
 							}
 						}
 					}
+				}
+			}
+		}
+		
+		public function removeDeleteButton($output) {
+			if ($this->hide_delete) {
+				$startpos = strpos($output['output'], '<button name="action[delete]"');
+				$endpos = strpos($output['output'], '</button>', $startpos);
+				if ($startpos !== FALSE && $endpos !== FALSE) {
+					$output['output'] = substr_replace($output['output'], '', $startpos, $endpos - $startpos);
 				}
 			}
 		}
