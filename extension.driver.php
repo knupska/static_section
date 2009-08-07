@@ -7,12 +7,12 @@
 	
 		protected $section_data;
 		protected $_page;
-		protected $hide_delete;
+		protected $static_section_name;
 		
 		public function about(){
 			return array('name' => 'Static Section',
-						 'version' => '1.1',
-						 'release-date' => '2009-08-06',
+						 'version' => '1.2',
+						 'release-date' => '2009-08-07',
 						 'author' => array('name' => 'Nathan Martin',
 										   'website' => 'http://knupska.com',
 										   'email' => 'nathan@knupska.com')
@@ -34,13 +34,13 @@
 						array(
 							'page' => '/administration/',
 							'delegate' => 'AdminPagePostGenerate',
-							'callback' => 'removeDeleteButton'
+							'callback' => 'modifyPageElements'
 						)
 			);
 		}
 		
 		public function appendScriptToHead($context) {
-			$this->hide_delete = false;
+			$this->static_section_name = '';
 			$entryManager = new EntryManager($this->_Parent);
 			$sections = $this->_Parent->Database->fetch("SELECT section_id AS id, handle FROM tbl_fields_static_section LEFT JOIN tbl_sections ON tbl_fields_static_section.section_id = tbl_sections.id");
 			$this->section_data = array(
@@ -61,7 +61,7 @@
 			$flag = $this->_page->_context['flag'];
 			
 			if (isset($section_handle)) {
-				$section = $this->_Parent->Database->fetchRow(0, "SELECT id FROM tbl_sections WHERE handle='$section_handle'");
+				$section = $this->_Parent->Database->fetchRow(0, "SELECT id, name FROM tbl_sections WHERE handle='$section_handle'");
 				$field = $this->_Parent->Database->fetchRow(0, "SELECT id FROM tbl_fields_static_section WHERE section_id=" . $section['id']);
 				
 				if($field) {
@@ -92,7 +92,7 @@
 							Alert::SUCCESS);
 					}
 					
-					$this->hide_delete = true;
+					$this->static_section_name = $section['name'];
 				}
 			}
 		}
@@ -124,8 +124,16 @@
 			}
 		}
 		
-		public function removeDeleteButton($output) {
-			if ($this->hide_delete) {
+		public function modifyPageElements($output) {
+			if ($this->static_section_name != '') {
+				// force static section title
+				$startpos = strpos($output['output'], '<h2>');
+				$endpos = strpos($output['output'], '</h2>', $startpos);
+				if ($startpos !== FALSE && $endpos !== FALSE) {
+					$output['output'] = substr_replace($output['output'], '<h2>' . $this->static_section_name . '</h2>', $startpos, $endpos - $startpos);
+				}
+				
+				// hide delete button
 				$startpos = strpos($output['output'], '<button name="action[delete]"');
 				$endpos = strpos($output['output'], '</button>', $startpos);
 				if ($startpos !== FALSE && $endpos !== FALSE) {
