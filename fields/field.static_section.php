@@ -41,6 +41,15 @@
 			return $this->_engine->Database->insert($fields, 'tbl_fields_' . $this->handle());					
 		}
 		
+		/**
+		 * Override 'include elements' (datasource edit page)
+		 * do not include anything
+		 */
+		public function fetchIncludableElements()
+		{
+		    return;
+		}
+
 		public function createTable() {
 			// override to stop the creation
 			// of an unnecessary table
