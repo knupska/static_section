@@ -49,14 +49,6 @@
 		{
 		    return;
 		}
-
-		public function createTable() {
-			// override to stop the creation
-			// of an unnecessary table
-			// no setting value needs to be
-			// stored by this extension field
-			return true;
-		}		
 	}
 
 ?>

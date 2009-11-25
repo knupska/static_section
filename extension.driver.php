@@ -11,7 +11,7 @@
 		
 		public function about(){
 			return array('name' => 'Static Section',
-						 'version' => '1.2',
+						 'version' => '1.3',
 						 'release-date' => '2009-08-07',
 						 'author' => array('name' => 'Nathan Martin',
 										   'website' => 'http://knupska.com',

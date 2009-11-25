@@ -1,7 +1,7 @@
 Static Section Field
 ------------------------------------
 
-Version: 1.2
+Version: 1.3
 Author: Nathan Martin (nathan@knupska.com)
 Build Date: 2009-08-07
 Requirements: Symphony 2.0.6
