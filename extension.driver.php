@@ -67,7 +67,7 @@
 
 			$tags = new XMLElement('ul');
 			$tags->setAttribute('class', 'tags');
-			
+
 			foreach($availableSections as $section){
 				$tags->appendChild(new XMLElement('li', $section));
 			}
@@ -152,5 +152,3 @@
 			return Administration::instance()->Configuration->remove('sections', 'static_section');
 		}
 	}
-
-?>
