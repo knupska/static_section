@@ -1,5 +1,7 @@
-Static Section Field
-====================
+Static Section
+==============
+
+Static Sections simplify the process of editing field collections that should only exist once in Symphony.
 
 - Version: 1.4
 - Author: [Nathan Martin](mailto:nathan@knupska.com), [Rainer Borene](mailto:rainerborene@gmail.com)
