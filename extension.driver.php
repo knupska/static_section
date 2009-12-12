@@ -149,6 +149,7 @@
 		}
 
 		public function uninstall(){
-			return Administration::instance()->Configuration->remove('sections', 'static_section');
+			Administration::instance()->Configuration->remove('sections', 'static_section');
+			return Administration::instance()->saveConfig();
 		}
 	}
