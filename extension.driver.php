@@ -103,6 +103,9 @@
 				$title = $xpath->query("/html/head/title")->item(0);
 				$title->nodeValue = __('%1$s &ndash; %2$s', array(__('Symphony'), $section->get('name')));
 
+				$h2 = $xpath->query("/html/body/form/h2")->item(0);
+				$h2->nodeValue = $section->get('name');
+
 				if ($this->_callback['context']['page'] == 'edit'){
 					$delete = $xpath->query("//div[@class='actions']/button[@name='action[delete]']")->item(0);
 					$delete->parentNode->removeChild($delete);
