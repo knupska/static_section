@@ -96,7 +96,11 @@
 
 				$section = $this->_sectionManager->fetch($this->_callback['context'][1]);
 
-				if ($section->get('static') == 'yes') $checkbox->setAttribute('checked', 'checked');
+				$errors = Administration::instance()->Page->_errors;
+
+				if (is_object($section) && $section->get('static') == 'yes' || is_array($errors) && !empty($errors) && $_POST['meta']['static'] == 'yes'){
+					$checkbox->setAttribute('checked', 'checked');
+				}
 
 				$label->appendChild($checkbox);
 				$label->appendChild(new DOMText(__('Make this section static (i.e a single entry section)')));
