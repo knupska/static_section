@@ -35,14 +35,9 @@
 		public function getSubscribedDelegates(){
 			return array(
 				array(
-					'page' => '/system/preferences/',
-					'delegate' => 'AddCustomPreferenceFieldsets',
-					'callback' => 'appendPreferences'
-				),
-				array(
 					'page' => '/backend/',
 					'delegate' => 'InitaliseAdminPageHead',
-					'callback' => 'applyStaticSection'
+					'callback' => 'redirectRules'
 				),
 				array(
 					'page' => '/administration/',
@@ -52,33 +47,10 @@
 			);
 		}
 
-		public function appendPreferences($context){
-			$sections = Administration::instance()->Configuration->get('sections', 'static_section');
-
-			$group = new XMLElement('fieldset');
-			$group->setAttribute('class', 'settings');
-			$group->appendChild(new XMLElement('legend', 'Static Section'));
-
-			$label = Widget::Label();
-			$label->appendChild(Widget::Input('settings[static_section][sections]', $sections));
-			$group->appendChild($label);
-
-			$availableSections = $this->getAvailableSections();
-
-			$tags = new XMLElement('ul');
-			$tags->setAttribute('class', 'tags');
-
-			foreach($availableSections as $section){
-				$tags->appendChild(new XMLElement('li', $section));
-			}
-
-			$group->appendChild($tags);
-
-			$context['wrapper']->appendChild($group);
-		}
-
-		public function applyStaticSection($context){
-			if ($this->_callback['driver'] == 'publish' && $this->_static){
+		public function redirectRules($context){
+			$this->fixPostValue();
+			
+			if ($this->_static){
 				$section_handle = $this->_callback['context']['section_handle'];
 				$entry = $this->getLastPosition($section_handle);
 
@@ -93,6 +65,49 @@
 		}
 
 		public function manipulateOutput($context){
+			$this->appendPreferences(&$context);
+			$this->applyStaticSection(&$context);
+		}
+
+		private function fixPostValue(){
+			if ($this->_callback['driver'] == 'blueprintssections' && in_array($this->_callback['context'][0], array('edit', 'new'))){
+				if ($_POST['action']['save']){
+					if (!$_POST['meta']['static']){
+						$a = array('static' => 'no');
+						$_POST['meta'] += $a;
+					}
+				}
+			}
+		}
+
+		private function appendPreferences($context){
+			if ($this->_callback['driver'] == 'blueprintssections' && in_array($this->_callback['context'][0], array('edit', 'new'))){
+				$dom = DOMDocument::loadHTML($context['output']);
+				$xpath = new DOMXPath($dom);
+
+				$meta = $xpath->query("//input[@name='meta[hidden]']")->item(0);
+
+				$label = $dom->createElement('label');
+
+				$checkbox = $dom->createElement('input');
+				$checkbox->setAttribute('type', 'checkbox');
+				$checkbox->setAttribute('name', 'meta[static]');
+				$checkbox->setAttribute('value', 'yes');
+
+				$section = $this->_sectionManager->fetch($this->_callback['context'][1]);
+
+				if ($section->get('static') == 'yes') $checkbox->setAttribute('checked', 'checked');
+
+				$label->appendChild($checkbox);
+				$label->appendChild(new DOMText(__('Make this section static (i.e a single entry section)')));
+
+				$meta->parentNode->parentNode->appendChild($label);
+
+				$context['output'] = $dom->saveHTML();
+			}
+		}
+
+		private function applyStaticSection(&$context){
 			if ($this->_static){
 				$section_id = $this->_sectionManager->fetchIDFromHandle($this->_callback['context']['section_handle']);
 				$section = !is_null($section_id) ? $this->_sectionManager->fetch($section_id) : null;
@@ -116,14 +131,12 @@
 		}
 
 		private function isStaticSection(){
-			$sections = explode(',', Administration::instance()->Configuration->get('sections', 'static_section'));
+			if ($this->_callback['driver'] == 'publish' && is_array($this->_callback['context'])){
+				$section_id = $this->_sectionManager->fetchIDFromHandle($this->_callback['context']['section_handle']);
+				$section = $this->_sectionManager->fetch($section_id);
 
-			foreach($sections as $i => $s)
-				$sections[$i] = trim($s);
-
-			if (is_array($this->_callback['context']) && in_array($this->_callback['context']['section_handle'], $sections)) return true;
-
-			return false;
+				if ($section->get('static') == 'yes') return true;
+			}
 		}
 
 		private function getLastPosition($section_handle){
@@ -138,21 +151,11 @@
 			}
 		}
 
-		private function getAvailableSections(){
-			$sections = $this->_sectionManager->fetch();
-			$result = array();
-
-			if (is_array($sections) && !empty($sections)){
-				foreach($sections as $s){
-					$result[] = $s->get('handle');
-				}
-			}
-
-			return $result;
+		public function install(){
+			return Administration::instance()->Database->query("ALTER TABLE `sym_sections` ADD `static` enum('yes','no') NOT NULL DEFAULT 'no' AFTER `hidden`");
 		}
 
 		public function uninstall(){
-			Administration::instance()->Configuration->remove('sections', 'static_section');
-			return Administration::instance()->saveConfig();
+			return Administration::instance()->Database->query("ALTER TABLE `tbl_sections` DROP `static`");
 		}
 	}
