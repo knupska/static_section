@@ -49,7 +49,7 @@
 
 		public function redirectRules($context){
 			$this->fixPostValue();
-			
+
 			if ($this->_static){
 				$section_handle = $this->_callback['context']['section_handle'];
 				$entry = $this->getLastPosition($section_handle);
@@ -65,17 +65,14 @@
 		}
 
 		public function manipulateOutput($context){
-			$this->appendPreferences(&$context);
-			$this->applyStaticSection(&$context);
+			$this->appendPreferences($context);
+			$this->applyStaticSection($context);
 		}
 
 		private function fixPostValue(){
 			if ($this->_callback['driver'] == 'blueprintssections' && in_array($this->_callback['context'][0], array('edit', 'new'))){
 				if ($_POST['action']['save']){
-					if (!$_POST['meta']['static']){
-						$a = array('static' => 'no');
-						$_POST['meta'] += $a;
-					}
+					if (!$_POST['meta']['static']) $_POST['meta'] += array('static' => 'no');
 				}
 			}
 		}
@@ -114,7 +111,7 @@
 		private function applyStaticSection(&$context){
 			if ($this->_static){
 				$section_id = $this->_sectionManager->fetchIDFromHandle($this->_callback['context']['section_handle']);
-				$section = !is_null($section_id) ? $this->_sectionManager->fetch($section_id) : null;
+				$section = $this->_sectionManager->fetch($section_id);
 
 				$dom = DOMDocument::loadHTML($context['output']);
 				$xpath = new DOMXPath($dom);
@@ -145,7 +142,6 @@
 
 		private function getLastPosition($section_handle){
 			$this->_entryManager->setFetchSortingDirection('DESC');
-
 			$section_id = $this->_sectionManager->fetchIDFromHandle($section_handle);
 			$entry = $this->_entryManager->fetch(NULL, $section_id, 1);
 
@@ -162,4 +158,5 @@
 		public function uninstall(){
 			return Administration::instance()->Database->query("ALTER TABLE `tbl_sections` DROP `static`");
 		}
+
 	}
