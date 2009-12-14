@@ -22,7 +22,7 @@ Static Sections simplify the process of editing field collections that should on
 
 1. When adding to a previously created section, please ensure that the section contains only one entry.  
    If added to a section that contains multiple entries, only the first entry in that section will be  
-   available to edit until the "Static Section" field is removed from the section.
+   available to edit until the "Static Section" flag is removed from the section
 
 2. This extension does not modify the section data source output.  
    As such if there are additional entries (more than one) in the section, these additional entries  
