@@ -100,7 +100,7 @@
 				}
 
 				$label->appendChild($checkbox);
-				$label->appendChild(new DOMText(__('Make this section static (i.e a single entry section)')));
+				$label->appendChild(new DOMText(__('Make this section static (i.e. a single entry section)')));
 
 				$meta->parentNode->parentNode->appendChild($label);
 
@@ -152,7 +152,7 @@
 		}
 
 		public function install(){
-			return Administration::instance()->Database->query("ALTER TABLE `sym_sections` ADD `static` enum('yes','no') NOT NULL DEFAULT 'no' AFTER `hidden`");
+			return Administration::instance()->Database->query("ALTER TABLE `tbl_sections` ADD `static` enum('yes','no') NOT NULL DEFAULT 'no' AFTER `hidden`");
 		}
 
 		public function uninstall(){
