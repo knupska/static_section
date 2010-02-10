@@ -79,7 +79,7 @@
 
 		private function appendPreferences($context){
 			if ($this->_callback['driver'] == 'blueprintssections' && in_array($this->_callback['context'][0], array('edit', 'new'))){
-				$dom = DOMDocument::loadHTML($context['output']);
+				$dom = @DOMDocument::loadHTML($context['output']);
 				$xpath = new DOMXPath($dom);
 
 				$meta = $xpath->query("//input[@name='meta[hidden]']")->item(0);
@@ -113,7 +113,7 @@
 				$section_id = $this->_sectionManager->fetchIDFromHandle($this->_callback['context']['section_handle']);
 				$section = $this->_sectionManager->fetch($section_id);
 
-				$dom = DOMDocument::loadHTML($context['output']);
+				$dom = @DOMDocument::loadHTML($context['output']);
 				$xpath = new DOMXPath($dom);
 
 				$title = $xpath->query("/html/head/title")->item(0);
