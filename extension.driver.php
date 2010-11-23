@@ -53,13 +53,14 @@
 			if ($this->_static){
 				$section_handle = $this->_callback['context']['section_handle'];
 				$entry = $this->getLastPosition($section_handle);
+				$params = $this->getConcatenatedParams();
 
 				if ($this->_callback['context']['entry_id'] != $entry || $this->_callback['context']['page'] == 'index'){
-					redirect(URL . "/symphony/publish/{$section_handle}/edit/{$entry}/");
+					redirect(URL . "/symphony/publish/{$section_handle}/edit/{$entry}/{$params}");
 				}
 
 				if (!$entry && $this->_callback['context']['page'] != 'new'){
-					redirect(URL . "/symphony/publish/{$section_handle}/new/");
+					redirect(URL . "/symphony/publish/{$section_handle}/new/{$params}");
 				}
 			}
 		}
@@ -67,6 +68,23 @@
 		public function manipulateOutput($context){
 			$this->appendPreferences($context);
 			$this->applyStaticSection($context);
+		}
+
+		public function getConcatenatedParams(){
+			if (count($_GET) > 2) {
+				$params = "?";
+			}
+
+			foreach($_GET as $key => $value){
+				if (in_array($key, array('symphony-page', 'mode'))) continue;
+				
+				$params .= "{$key}={$value}";
+				if (next($_GET)) {
+					$params .= '&';
+				}
+			}
+			
+			return $params;
 		}
 
 		private function fixPostValue(){
