@@ -134,9 +134,11 @@
 		private function isStaticSection(){
 			if ($this->_callback['driver'] == 'publish' && is_array($this->_callback['context'])){
 				$section_id = $this->_sectionManager->fetchIDFromHandle($this->_callback['context']['section_handle']);
-				$section = $this->_sectionManager->fetch($section_id);
 
-				if ($section->get('static') == 'yes') return true;
+				if ($section_id){
+					$section = $this->_sectionManager->fetch($section_id);
+					return ($section->get('static') == 'yes');
+				}
 			}
 		}
 
