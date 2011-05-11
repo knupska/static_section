@@ -5,29 +5,38 @@
 
 	Class extension_static_section extends Extension{
 
-		private $_sectionManager;
-		private $_entryManager;
 		private $_callback;
 		private $_static;
+		private $_section;
 
 		public function __construct($args){
 			$this->_Parent =& $args['parent'];
 
-			$this->_sectionManager = new SectionManager($this->_Parent);
-			$this->_entryManager = new EntryManager($this->_Parent);
 			$this->_callback = Administration::instance()->getPageCallback();
+			$this->_section = $this->getSection();
 			$this->_static = $this->isStaticSection();
 		}
 
 		public function about(){
 			return array(
 				'name' => 'Static Section',
-				'version' => '1.6',
-				'release-date' => '2011-04-27',
+				'version' => '1.6.1',
+				'release-date' => '2011-05-11',
 				'author' => array(
-					'name' => 'Nathan Martin',
-					'website' => 'http://knupska.com',
-					'email' => 'nathan@knupska.com'
+					array(
+						'name' => 'Nathan Martin',
+						'website' => 'http://knupska.com',
+						'email' => 'nathan@knupska.com'
+					),
+					array(
+						'name' => 'Rainer Borene',
+						'website' => 'http://rainerborene.com',
+						'email' => 'me@rainerborene.com'
+					),
+					array(
+						'name' => 'Vlad Ghita',
+						'email' => 'vlad_micutul@yahoo.com'
+					)
 				)
 			);
 		}
@@ -53,18 +62,24 @@
 					'page'		=> '/blueprints/sections/',
 					'delegate'	=> 'SectionPreEdit',
 					'callback'	=> 'save_section_settings'
+				),
+				array(
+					'page'		=> '/backend/',
+					'delegate'	=> 'AppendElementBelowView',
+					'callback'	=> 'append_element_below_view'
 				)
 			);
 		}
 
+		
 	/*-------------------------------------------------------------------------
 		Delegates
 	-------------------------------------------------------------------------*/
 		
 		public function redirectRules($context){
 			if ($this->_static){
-				$section_handle = $this->_callback['context']['section_handle'];
-				$entry = $this->getLastPosition($section_handle);
+				$section_handle = $this->_section->get('handle');
+				$entry = $this->getLastPosition();
 				$params = $this->getConcatenatedParams();
 
 				if ($this->_callback['context']['entry_id'] != $entry || $this->_callback['context']['page'] == 'index'){
@@ -105,28 +120,46 @@
 			}
 		}
 		
+		public function append_element_below_view($context){
+			
+			// if static section, replace __FIRST__ <h2> title with section name
+			if ( $this->_static ) {
+				
+				foreach ( $context['parent']->Page->Contents->getChildren() as $child ) {
+				
+					if ($child->getName() == 'h2') {
+						$child->setValue($this->_section->get('name'));
+						break;
+					}
+				}
+			}
+		}
+		
+		
 	/*-------------------------------------------------------------------------
 		Helpers
 	-------------------------------------------------------------------------*/
+
+		private function getSection(){
+			$sm = new SectionManager($this->_Parent);
+			$section_id = $sm->fetchIDFromHandle($this->_callback['context']['section_handle']);
+			
+			return $sm->fetch($section_id);
+		}
 		
 		private function isStaticSection(){
 			if ($this->_callback['driver'] == 'publish' && is_array($this->_callback['context'])){
-				$section_id = $this->_sectionManager->fetchIDFromHandle($this->_callback['context']['section_handle']);
-
-				if ($section_id){
-					$section = $this->_sectionManager->fetch($section_id);
-					return ($section->get('static') == 'yes');
-				}
+				return ($this->_section->get('static') == 'yes');
 			}
 			
 			return false;
 		}
 		
-		
-		private function getLastPosition($section_handle){
-			$this->_entryManager->setFetchSortingDirection('DESC');
-			$section_id = $this->_sectionManager->fetchIDFromHandle($section_handle);
-			$entry = $this->_entryManager->fetch(NULL, $section_id, 1);
+		private function getLastPosition(){
+			$em = new EntryManager($this->_Parent);
+			
+			$em->setFetchSortingDirection('DESC');
+			$entry = $em->fetch(NULL, $this->_section->get('id'), 1);
 
 			if (is_array($entry) && !empty($entry)){
 				$entry = end($entry);
@@ -151,6 +184,8 @@
 			return $params;
 		}
 		
+	
+	
 	/*-------------------------------------------------------------------------
 		Installation
 	-------------------------------------------------------------------------*/

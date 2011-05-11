@@ -3,9 +3,9 @@ Static Section
 
 Static Sections simplify the process of editing field collections that should only exist once in Symphony.
 
-- Version: 1.6
+- Version: 1.6.1
 - Author: [Nathan Martin](mailto:nathan@knupska.com), [Rainer Borene](mailto:rainerborene@gmail.com), [Vlad Ghita](mailto:vlad.ghita@xandergroup.ro)
-- Build Date: 2011-04-27
+- Build Date: 2011-01-11
 - Requirements: Symphony 2.2.1
 
 ### Installation
@@ -28,8 +28,19 @@ Static Sections simplify the process of editing field collections that should on
 
 ## Compatibility
 
-  Symphony    | Static Section
+Symphony    | Static Section
   ------------| -------------
   2.0 – 2.0.5 | Not compatible
   2.0.6 – 2.2 | [1.5](https://github.com/knupska/static_section/tree/1.5)
-  2.2.*       | [latest](https://github.com/knupska/static_section/tree/1.6)
+  2.2.*       | [latest](https://github.com/knupska/static_section/tree/1.6.1)
+
+## Changelog
+
+**1.6.1**
+
+- when static section, `<h2>` element from `publish/edit` and `publish/new` page contains section name
+- refactored the code
+
+**1.6**
+
+- rewrite for Symphony 2.2.1 new delegates
