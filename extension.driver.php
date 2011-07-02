@@ -51,22 +51,22 @@
 				array(
 					'page' => '/blueprints/sections/',
 					'delegate' => 'AddSectionElements',
-					'callback' => 'add_section_settings'
+					'callback' => 'addSectionSettings'
 				),
 				array(
 					'page'		=> '/blueprints/sections/',
 					'delegate'	=> 'SectionPreCreate',
-					'callback'	=> 'save_section_settings'
+					'callback'	=> 'saveSectionSettings'
 				),
 				array(
 					'page'		=> '/blueprints/sections/',
 					'delegate'	=> 'SectionPreEdit',
-					'callback'	=> 'save_section_settings'
+					'callback'	=> 'saveSectionSettings'
 				),
 				array(
 					'page'		=> '/backend/',
 					'delegate'	=> 'AppendElementBelowView',
-					'callback'	=> 'append_element_below_view'
+					'callback'	=> 'appendElementBelowView'
 				)
 			);
 		}
@@ -92,7 +92,7 @@
 			}
 		}
 
-		public function add_section_settings($context) {
+		public function addSectionSettings($context) {
 			
 			// Get current setting
 			$setting = array();
@@ -114,13 +114,13 @@
 			$column[0]->appendChild($label);
 		}
 		
-		public function save_section_settings($context) {
+		public function saveSectionSettings($context) {
 			if(!$context['meta']['static']) {
 				$context['meta']['static'] = 'no';
 			}
 		}
 		
-		public function append_element_below_view($context){
+		public function appendElementBelowView($context){
 			
 			// if static section, replace __FIRST__ <h2> title with section name
 			if ( $this->_static ) {
@@ -147,7 +147,7 @@
 			return $sm->fetch($section_id);
 		}
 		
-		private function isStaticSection(){
+		public function isStaticSection(){
 			if ($this->_callback['driver'] == 'publish' && is_array($this->_callback['context'])){
 				return ($this->_section->get('static') == 'yes');
 			}
