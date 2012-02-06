@@ -40,7 +40,7 @@
 				)
 			);
 		}
-	
+
 		public function getSubscribedDelegates(){
 			return array(
 				array(
@@ -71,11 +71,11 @@
 			);
 		}
 
-		
+
 	/*-------------------------------------------------------------------------
 		Delegates
 	-------------------------------------------------------------------------*/
-		
+
 		public function redirectRules($context){
 			if ($this->_static){
 				$section_handle = $this->_section->get('handle');
@@ -83,50 +83,56 @@
 				$params = $this->getConcatenatedParams();
 
 				if ($this->_callback['context']['entry_id'] != $entry || $this->_callback['context']['page'] == 'index'){
-					redirect(URL . "/symphony/publish/{$section_handle}/edit/{$entry}/{$params}");
+					redirect(SYMPHONY_URL . "/publish/{$section_handle}/edit/{$entry}/{$params}");
 				}
 
 				if (!$entry && $this->_callback['context']['page'] != 'new'){
-					redirect(URL . "/symphony/publish/{$section_handle}/new/{$params}");
+					redirect(SYMPHONY_URL . "/publish/{$section_handle}/new/{$params}");
 				}
 			}
 		}
 
 		public function addSectionSettings($context) {
-			
 			// Get current setting
 			$setting = array();
 			if($context['meta']['static'] == 'yes') {
 				$setting = array('checked' => 'checked');
 			}
-			
+
 			// Prepare setting
 			$label = new XMLElement('label');
 			$checkbox = new XMLElement('input', ' ' . __('Make this section static (i.e. a single entry section)'), array_merge($setting, array('name' => 'meta[static]', 'type' => 'checkbox', 'value' => 'yes')));
 			$label->appendChild($checkbox);
-			
+
 			// Find context
-			$fieldset = $context['form']->getChildren();
-			$group = $fieldset[0]->getChildren();
-			$column = $group[1]->getChildren();
-			
-			// Append setting
-			$column[0]->appendChild($label);
+			$children = $context['form']->getChildren();
+			foreach( $children as $element ) {
+				// Only work with Fieldset, improves compatibility with other extensions
+				if($element->getName() !== 'fieldset') continue;
+
+				$group = $element->getChildren();
+				$column = $group[1]->getChildren();
+
+				// Append setting
+				$column[0]->appendChild($label);
+
+				break;
+			}
 		}
-		
+
 		public function saveSectionSettings($context) {
 			if(!$context['meta']['static']) {
 				$context['meta']['static'] = 'no';
 			}
 		}
-		
+
 		public function appendElementBelowView($context){
-			
+
 			// if static section, replace __FIRST__ <h2> title with section name
 			if ( $this->_static ) {
-				
+
 				foreach ( $context['parent']->Page->Contents->getChildren() as $child ) {
-				
+
 					if ($child->getName() == 'h2') {
 						$child->setValue($this->_section->get('name'));
 						break;
@@ -134,8 +140,8 @@
 				}
 			}
 		}
-		
-		
+
+
 	/*-------------------------------------------------------------------------
 		Helpers
 	-------------------------------------------------------------------------*/
@@ -143,21 +149,21 @@
 		private function getSection(){
 			$sm = new SectionManager($this->_Parent);
 			$section_id = $sm->fetchIDFromHandle($this->_callback['context']['section_handle']);
-			
+
 			return $sm->fetch($section_id);
 		}
-		
+
 		public function isStaticSection(){
 			if ($this->_callback['driver'] == 'publish' && is_array($this->_callback['context'])){
 				return ($this->_section->get('static') == 'yes');
 			}
-			
+
 			return false;
 		}
-		
+
 		private function getLastPosition(){
 			$em = new EntryManager($this->_Parent);
-			
+
 			$em->setFetchSortingDirection('DESC');
 			$entry = $em->fetch(NULL, $this->_section->get('id'), 1);
 
@@ -166,7 +172,7 @@
 				return $entry->get('id');
 			}
 		}
-		
+
 		private function getConcatenatedParams(){
 			if (count($_GET) > 2) {
 				$params = "?";
@@ -174,28 +180,28 @@
 
 			foreach($_GET as $key => $value){
 				if (in_array($key, array('symphony-page', 'mode'))) continue;
-				
+
 				$params .= "{$key}={$value}";
 				if (next($_GET)) {
 					$params .= '&';
 				}
 			}
-			
+
 			return $params;
 		}
-		
-	
-	
+
+
+
 	/*-------------------------------------------------------------------------
 		Installation
 	-------------------------------------------------------------------------*/
-		
+
 		public function install(){
-			return Administration::instance()->Database->query("ALTER TABLE `tbl_sections` ADD `static` enum('yes','no') NOT NULL DEFAULT 'no' AFTER `hidden`");
+			return Symphony::Database()->query("ALTER TABLE `tbl_sections` ADD `static` enum('yes','no') NOT NULL DEFAULT 'no' AFTER `hidden`");
 		}
 
 		public function uninstall(){
-			return Administration::instance()->Database->query("ALTER TABLE `tbl_sections` DROP `static`");
+			return Symphony::Database()->query("ALTER TABLE `tbl_sections` DROP `static`");
 		}
 
 	}
